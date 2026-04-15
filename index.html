@@ -64,7 +64,7 @@
 </head>
 <body>
 
-<div id="loadingInfo" class="loader">ŁADOWANIE DANYCH Z ARKUSZA...</div>
+<div id="loadingInfo" class="loader">SYNCHRONIZACJA Z ARKUSZEM...</div>
 
 <div class="app-container">
     <div class="left-section">
@@ -79,7 +79,7 @@
         </div>
 
         <div class="glass-card">
-            <div id="monthlyHeader" style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 15px;">WYDARZENIA W MIESIĄCU</div>
+            <div id="monthlyHeader" style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 15px; text-transform: uppercase;">Wydarzenia w miesiącu</div>
             <div id="monthlyList"></div>
         </div>
     </div>
@@ -91,25 +91,23 @@
                 <input type="date" id="fDate">
                 <input type="time" id="fTime">
             </div>
-            <input type="text" id="fDesc" placeholder="Wydarzenie">
-            <button class="btn-save" onclick="save()">Zapisz w Arkuszu</button>
+            <input type="text" id="fDesc" placeholder="Nazwa wydarzenia">
+            <button class="btn-save" id="saveBtn" onclick="save()">Zapisz w Arkuszu</button>
         </div>
 
         <div class="glass-card">
-            <div id="listDate" style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 15px;">HARMONOGRAM DNIA</div>
+            <div id="listDate" style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 15px; text-transform: uppercase;">Harmonogram dnia</div>
             <div id="dayList"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- KONFIGURACJA ---
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNiKrC-RFHrTwkh_jp8WvSsgYWL0AiDq1DTwRWQxES9_IPiVEXBaRPka-zYYu_TTg8/exec"; 
 
     let db = [];
     let viewDate = new Date();
     let selDate = new Date();
-    let currentView = 'month';
 
     async function loadData() {
         document.getElementById('loadingInfo').style.display = 'block';
@@ -123,24 +121,39 @@
     }
 
     async function save() {
+        const descInput = document.getElementById('fDesc');
+        if(!descInput.value) return alert("Wpisz nazwę wydarzenia!");
+
         const ev = {
             id: document.getElementById('eId').value || Date.now(),
             d: document.getElementById('fDate').value,
             t: document.getElementById('fTime').value,
-            desc: document.getElementById('fDesc').value
+            desc: descInput.value
         };
         
-        // Lokalna aktualizacja dla szybkości
         const idx = db.findIndex(x => x.id == ev.id);
         if(idx > -1) db[idx] = ev; else db.push(ev);
+        
         render();
+        descInput.value = ""; // Czyścimy pole po zapisie
 
-        // Wysyłka do Google Sheets
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ action: 'save', events: db })
-        });
+        const btn = document.getElementById('saveBtn');
+        btn.innerText = "ZAPISYWANIE...";
+        btn.style.opacity = "0.5";
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: 'save', events: db })
+            });
+            btn.innerText = "ZAPISANO!";
+            setTimeout(() => { btn.innerText = "Zapisz w Arkuszu"; btn.style.opacity = "1"; }, 2000);
+        } catch (e) {
+            alert("Błąd zapisu!");
+            btn.innerText = "Zapisz w Arkuszu";
+            btn.style.opacity = "1";
+        }
     }
 
     function render() {
@@ -156,10 +169,10 @@
         
         mLabel.innerText = viewDate.toLocaleString('pl', { month: 'long', year: 'numeric' }).toUpperCase();
         
-        // Calendar
         ['Pn','Wt','Śr','Cz','Pt','Sb','Nd'].forEach(h => grid.innerHTML += `<div class="day-name">${h}</div>`);
         const first = (new Date(y, m, 1).getDay() || 7) - 1;
         const days = new Date(y, m + 1, 0).getDate();
+        
         for(let i=0; i<first; i++) grid.innerHTML += `<div></div>`;
         for(let i=1; i<=days; i++) {
             const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
@@ -167,32 +180,46 @@
             grid.innerHTML += `<div class="day ${selStr==dStr?'selected':''}" onclick="onDayClick('${dStr}')">${i}${hasE?'<div class="dot"></div>':''}</div>`;
         }
 
-        // Lists
         const daily = db.filter(e => e.d == selStr).sort((a,b)=>a.t.localeCompare(b.t));
-        dList.innerHTML = daily.map(e => `<div class="event-card"><div class="ev-info"><div class="ev-title">${e.t} - ${e.desc}</div></div><button onclick="del(${e.id})" style="background:none; border:none; color:red; cursor:pointer;">✕</button></div>`).join('');
+        dList.innerHTML = daily.map(e => `
+            <div class="event-card">
+                <div class="ev-info">
+                    <div class="ev-title">${e.t} - ${e.desc}</div>
+                </div>
+                <button onclick="del(${e.id})" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold; padding:5px;">✕</button>
+            </div>`).join('');
 
         const monthly = db.filter(e => e.d.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).sort((a,b)=>a.d.localeCompare(b.d));
-        mList.innerHTML = monthly.map(e => `<div class="event-card" onclick="onDayClick('${e.d}')"><div class="ev-info"><div class="ev-sub">${e.d} | ${e.t}</div><div class="ev-title">${e.desc}</div></div></div>`).join('');
+        mList.innerHTML = monthly.map(e => `
+            <div class="event-card" onclick="onDayClick('${e.d}')" style="cursor:pointer">
+                <div class="ev-info">
+                    <div class="ev-sub">${e.d} | ${e.t}</div>
+                    <div class="ev-title">${e.desc}</div>
+                </div>
+            </div>`).join('');
     }
 
     function onDayClick(dStr) {
         selDate = new Date(dStr);
         document.getElementById('fDate').value = dStr;
-        const card = document.getElementById('formCard');
-        card.classList.add('highlight-form');
-        setTimeout(() => card.classList.remove('highlight-form'), 800);
+        document.getElementById('formCard').classList.add('highlight-form');
+        setTimeout(() => document.getElementById('formCard').classList.remove('highlight-form'), 800);
         render();
     }
 
     function adjustDate(s) { viewDate.setMonth(viewDate.getMonth() + s); render(); }
-    function setView(v) { currentView = v; render(); }
+    function setView(v) { render(); }
     
     function del(id) {
+        if(!confirm("Usunąć to wydarzenie?")) return;
         db = db.filter(e => e.id != id);
         save();
     }
 
-    window.onload = loadData;
+    window.onload = () => {
+        document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+        loadData();
+    };
 </script>
 </body>
 </html>
