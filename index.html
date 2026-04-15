@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Darts Master Planner Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f111a;
+            --glass-bg: rgba(26, 29, 46, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            background: var(--bg-dark);
+            background-image: radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.15) 0%, transparent 40%), url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 15px;
+        }
+
+        .app-container { width: 100%; max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; }
+        @media (max-width: 850px) { .app-container { grid-template-columns: 1fr; } }
+
+        .glass-card {
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .view-switcher { display: flex; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 12px; margin-bottom: 15px; }
+        .view-btn { flex: 1; border: none; background: none; color: var(--text-dim); padding: 8px; border-radius: 9px; cursor: pointer; font-size: 0.7rem; font-weight: 700; }
+        .view-btn.active { background: var(--accent-blue); color: white; }
+
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .day-name { font-size: 0.6rem; color: var(--text-dim); text-align: center; font-weight: 800; padding-bottom: 8px; }
+        .day {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; font-size: 0.85rem; cursor: pointer; position: relative; background: rgba(255,255,255,0.03);
+        }
+        .day.selected { background: var(--accent-blue); box-shadow: 0 0 15px rgba(59,130,246,0.5); font-weight: 800; }
+        .dot { width: 4px; height: 4px; background: var(--accent-red); border-radius: 50%; position: absolute; bottom: 4px; }
+
+        .loader { display: none; text-align: center; color: var(--accent-blue); font-size: 0.8rem; margin-bottom: 10px; font-weight: 800; }
+
+        input { background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px; color: white; width: 100%; outline: none; margin-bottom: 10px; }
+        .btn-save { background: var(--accent-blue); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 800; cursor: pointer; }
+
+        .event-card {
+            background: rgba(255,255,255,0.03); border-radius: 16px; padding: 12px; border: 1px solid var(--glass-border);
+            display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+        }
+        .ev-info { flex-grow: 1; }
+        .ev-title { font-size: 0.9rem; font-weight: 700; }
+        .ev-sub { font-size: 0.7rem; color: var(--text-dim); }
+
+        .highlight-form { animation: glow 0.8s; }
+        @keyframes glow { 50% { box-shadow: 0 0 20px var(--accent-blue); } }
+    </style>
+</head>
+<body>
+
+<div id="loadingInfo" class="loader">ŁADOWANIE DANYCH Z ARKUSZA...</div>
+
+<div class="app-container">
+    <div class="left-section">
+        <div class="glass-card">
+            <div class="view-switcher">
+                <button id="v-month" class="view-btn active" onclick="setView('month')">Miesiąc</button>
+                <button class="view-btn" onclick="adjustDate(-1)">Poprzedni</button>
+                <button class="view-btn" onclick="adjustDate(1)">Następny</button>
+            </div>
+            <div id="mLabel" style="font-weight: 800; text-align: center; margin-bottom: 15px;"></div>
+            <div class="grid" id="calGrid"></div>
+        </div>
+
+        <div class="glass-card">
+            <div id="monthlyHeader" style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 15px;">WYDARZENIA W MIESIĄCU</div>
+            <div id="monthlyList"></div>
+        </div>
+    </div>
+
+    <div class="right-section">
+        <div class="glass-card" id="formCard">
+            <input type="hidden" id="eId">
+            <div style="display:flex; gap:10px;">
+                <input type="date" id="fDate">
+                <input type="time" id="fTime">
+            </div>
+            <input type="text" id="fDesc" placeholder="Wydarzenie">
+            <button class="btn-save" onclick="save()">Zapisz w Arkuszu</button>
+        </div>
+
+        <div class="glass-card">
+            <div id="listDate" style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 15px;">HARMONOGRAM DNIA</div>
+            <div id="dayList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- KONFIGURACJA ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNiKrC-RFHrTwkh_jp8WvSsgYWL0AiDq1DTwRWQxES9_IPiVEXBaRPka-zYYu_TTg8/exec"; 
+
+    let db = [];
+    let viewDate = new Date();
+    let selDate = new Date();
+    let currentView = 'month';
+
+    async function loadData() {
+        document.getElementById('loadingInfo').style.display = 'block';
+        try {
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+            db = data.map(r => ({ id: r[0], d: r[1], t: r[2], desc: r[3] }));
+            render();
+        } catch (e) { console.error("Błąd pobierania", e); }
+        document.getElementById('loadingInfo').style.display = 'none';
+    }
+
+    async function save() {
+        const ev = {
+            id: document.getElementById('eId').value || Date.now(),
+            d: document.getElementById('fDate').value,
+            t: document.getElementById('fTime').value,
+            desc: document.getElementById('fDesc').value
+        };
+        
+        // Lokalna aktualizacja dla szybkości
+        const idx = db.findIndex(x => x.id == ev.id);
+        if(idx > -1) db[idx] = ev; else db.push(ev);
+        render();
+
+        // Wysyłka do Google Sheets
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ action: 'save', events: db })
+        });
+    }
+
+    function render() {
+        const grid = document.getElementById('calGrid');
+        const mLabel = document.getElementById('mLabel');
+        const dList = document.getElementById('dayList');
+        const mList = document.getElementById('monthlyList');
+        grid.innerHTML = '';
+
+        const y = viewDate.getFullYear();
+        const m = viewDate.getMonth();
+        const selStr = selDate.toISOString().split('T')[0];
+        
+        mLabel.innerText = viewDate.toLocaleString('pl', { month: 'long', year: 'numeric' }).toUpperCase();
+        
+        // Calendar
+        ['Pn','Wt','Śr','Cz','Pt','Sb','Nd'].forEach(h => grid.innerHTML += `<div class="day-name">${h}</div>`);
+        const first = (new Date(y, m, 1).getDay() || 7) - 1;
+        const days = new Date(y, m + 1, 0).getDate();
+        for(let i=0; i<first; i++) grid.innerHTML += `<div></div>`;
+        for(let i=1; i<=days; i++) {
+            const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+            const hasE = db.some(e => e.d == dStr);
+            grid.innerHTML += `<div class="day ${selStr==dStr?'selected':''}" onclick="onDayClick('${dStr}')">${i}${hasE?'<div class="dot"></div>':''}</div>`;
+        }
+
+        // Lists
+        const daily = db.filter(e => e.d == selStr).sort((a,b)=>a.t.localeCompare(b.t));
+        dList.innerHTML = daily.map(e => `<div class="event-card"><div class="ev-info"><div class="ev-title">${e.t} - ${e.desc}</div></div><button onclick="del(${e.id})" style="background:none; border:none; color:red; cursor:pointer;">✕</button></div>`).join('');
+
+        const monthly = db.filter(e => e.d.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).sort((a,b)=>a.d.localeCompare(b.d));
+        mList.innerHTML = monthly.map(e => `<div class="event-card" onclick="onDayClick('${e.d}')"><div class="ev-info"><div class="ev-sub">${e.d} | ${e.t}</div><div class="ev-title">${e.desc}</div></div></div>`).join('');
+    }
+
+    function onDayClick(dStr) {
+        selDate = new Date(dStr);
+        document.getElementById('fDate').value = dStr;
+        const card = document.getElementById('formCard');
+        card.classList.add('highlight-form');
+        setTimeout(() => card.classList.remove('highlight-form'), 800);
+        render();
+    }
+
+    function adjustDate(s) { viewDate.setMonth(viewDate.getMonth() + s); render(); }
+    function setView(v) { currentView = v; render(); }
+    
+    function del(id) {
+        db = db.filter(e => e.id != id);
+        save();
+    }
+
+    window.onload = loadData;
+</script>
+</body>
+</html>
