@@ -15,34 +15,108 @@
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background: var(--bg); background-image: radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
-            color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 15px; min-height: 100vh;
+            background: var(--bg);
+            background-image: radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
         }
-        .app-container { width: 100%; max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .app-container { grid-template-columns: 1fr; } }
-        
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .app-container { grid-template-columns: 1fr; }
+        }
         .glass-card {
-            background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
-        .view-switcher { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .view-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
         .day {
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; font-size: 0.85rem; cursor: pointer; background: rgba(255,255,255,0.03); position: relative; transition: 0.2s;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            background: rgba(255,255,255,0.03);
+            position: relative;
+            transition: 0.2s;
         }
-        .day.selected { background: var(--accent); font-weight: 800; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-        .dot { width: 5px; height: 5px; background: #ef4444; border-radius: 50%; position: absolute; bottom: 4px; }
-        
-        input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: white; width: 100%; margin-bottom: 10px; font-family: inherit; }
-        .btn { background: linear-gradient(135deg, var(--accent), #1d4ed8); color: white; border: none; padding: 15px; border-radius: 14px; width: 100%; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .btn:active { transform: scale(0.98); }
-        
+        .day.selected {
+            background: var(--accent);
+            font-weight: 800;
+            box-shadow: 0 0 15px rgba(59,130,246,0.5);
+        }
+        .dot {
+            width: 5px;
+            height: 5px;
+            background: #ef4444;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+        }
+        input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            width: 100%;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+        .btn {
+            background: linear-gradient(135deg, var(--accent), #1d4ed8);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 14px;
+            width: 100%;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
         .event-item {
-            background: rgba(255,255,255,0.03); padding: 12px; border-radius: 14px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .loader { text-align: center; color: var(--accent); font-size: 0.75rem; font-weight: 800; margin-bottom: 15px; display: none; letter-spacing: 1px; }
+        .loader {
+            text-align: center;
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -54,14 +128,13 @@
         <div class="glass-card">
             <div class="view-switcher">
                 <button onclick="changeMonth(-1)" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer">❮</button>
-                <div id="monthYear" style="font-weight:800; letter-spacing:1px"></div>
+                <div id="monthYear" style="font-weight:800"></div>
                 <button onclick="changeMonth(1)" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer">❯</button>
             </div>
             <div class="grid" id="calendar"></div>
         </div>
-        
         <div class="glass-card" style="margin-top:20px;">
-            <div style="font-size:0.7rem; font-weight:800; color:var(--dim); margin-bottom:12px; text-transform:uppercase">Widok miesięczny</div>
+            <div style="font-size:0.7rem; font-weight:800; color:var(--dim); margin-bottom:12px;">WIDOK MIESIĄCA</div>
             <div id="monthList"></div>
         </div>
     </div>
@@ -71,21 +144,19 @@
             <div style="font-weight:800; margin-bottom:15px; color:var(--accent)">DODAJ WPIS</div>
             <input type="date" id="fDate">
             <input type="time" id="fTime" value="18:00">
-            <input type="text" id="fDesc" placeholder="Co gramy dzisiaj?">
+            <input type="text" id="fDesc" placeholder="Co gramy?">
             <button class="btn" id="saveBtn" onclick="save()">Zapisz w Google Sheets</button>
         </div>
-        
         <div class="glass-card" style="margin-top:20px;">
-            <div id="selDateLabel" style="font-size:0.7rem; font-weight:800; color:var(--dim); margin-bottom:12px; text-transform:uppercase">Plan dnia</div>
+            <div style="font-size:0.7rem; font-weight:800; color:var(--dim); margin-bottom:12px;">PLAN DNIA</div>
             <div id="dayList"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Twój aktualny link do skryptu Google
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNiKrC-RFHrTwkh_jp8WvSsgYWL0AiDq1DTwRWQxES9_IPiVEXBaRPka-zYYu_TTg8/exec";
-
+    
     let db = [];
     let curDate = new Date();
     let selDate = new Date().toISOString().split('T')[0];
@@ -95,27 +166,28 @@
         try {
             const r = await fetch(SCRIPT_URL);
             const d = await r.json();
+            // Mapowanie danych z Arkusza (ID, Data, Godzina, Opis)
             db = d.map(x => ({ id: x[0], d: x[1], t: x[2], desc: x[3] }));
             render();
-        } catch(e) { console.error("Błąd pobierania", e); }
-        document.getElementById('loader').style.display = 'none';
+        } catch(e) { 
+            console.error("Błąd pobierania", e); 
+        } finally {
+            document.getElementById('loader').style.display = 'none';
+        }
     }
 
     async function save() {
         const descInput = document.getElementById('fDesc');
-        const dateInput = document.getElementById('fDate');
-        const timeInput = document.getElementById('fTime');
-        if(!descInput.value) return alert("Wpisz opis wydarzenia!");
+        if(!descInput.value) return alert("Wpisz opis!");
 
         const btn = document.getElementById('saveBtn');
-        const originalText = btn.innerText;
         btn.innerText = "ŁĄCZENIE...";
         btn.disabled = true;
-        
+
         const newEv = { 
             id: Date.now(), 
-            d: dateInput.value, 
-            t: timeInput.value, 
+            d: document.getElementById('fDate').value, 
+            t: document.getElementById('fTime').value, 
             desc: descInput.value 
         };
         
@@ -123,7 +195,6 @@
         render();
 
         try {
-            // Używamy mode: 'no-cors', aby ominąć blokady CORS przy POST do Google Script
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -134,13 +205,13 @@
             btn.innerText = "ZAPISANO!";
             descInput.value = "";
             setTimeout(() => {
-                btn.innerText = originalText;
+                btn.innerText = "Zapisz w Google Sheets";
                 btn.disabled = false;
             }, 2000);
         } catch(e) { 
             alert("Błąd połączenia!");
-            btn.innerText = "SPRÓBUJ PONOWNIE";
             btn.disabled = false;
+            btn.innerText = "SPRÓBUJ PONOWNIE";
         }
     }
 
@@ -160,34 +231,35 @@
         for(let i=1; i<=days; i++) {
             const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
             const has = db.some(x => x.d === dStr);
-            const isSel = dStr === selDate;
-            cal.innerHTML += `<div class="day ${isSel?'selected':''}" onclick="selectDay('${dStr}')">${i}${has?'<div class="dot"></div>':''}</div>`;
+            cal.innerHTML += `<div class="day ${dStr===selDate?'selected':''}" onclick="selectDay('${dStr}')">${i}${has?'<div class="dot"></div>':''}</div>`;
         }
 
-        const dL = document.getElementById('dayList');
-        const daily = db.filter(x => x.d === selDate).sort((a,b) => a.t.localeCompare(b.t));
-        dL.innerHTML = daily.map(x => `
-            <div class="event-item">
-                <div><span style="color:var(--accent); font-weight:800">${x.t}</span> ${x.desc}</div>
-                <button onclick="del(${x.id})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:800">✕</button>
-            </div>
-        `).join('') || '<div style="color:var(--dim); font-size:0.8rem">Brak planów na ten dzień</div>';
+        document.getElementById('dayList').innerHTML = db.filter(x => x.d === selDate)
+            .map(x => `<div class="event-item"><div><b>${x.t}</b> ${x.desc}</div><button onclick="del(${x.id})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:800">✕</button></div>`)
+            .join('') || '<div style="color:var(--dim); font-size:0.8rem">Brak planów</div>';
 
-        const mL = document.getElementById('monthList');
-        const monthly = db.filter(x => x.d.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).sort((a,b) => a.d.localeCompare(b.d));
-        mL.innerHTML = monthly.map(x => `
-            <div class="event-item" onclick="selectDay('${x.d}')" style="cursor:pointer">
-                <div style="font-size:0.85rem">
-                    <span style="color:var(--dim)">${x.d.split('-')[2]}.${x.d.split('-')[1]}</span> | 
-                    <b>${x.t}</b> ${x.desc}
-                </div>
-            </div>
-        `).join('') || '<div style="color:var(--dim); font-size:0.8rem">Nic nie zaplanowano w tym miesiącu</div>';
+        document.getElementById('monthList').innerHTML = db.filter(x => x.d.startsWith(`${y}-${String(m+1).padStart(2,'0')}`))
+            .map(x => `<div class="event-item" onclick="selectDay('${x.d}')" style="cursor:pointer"><div>${x.d.split('-')[2]}.${x.d.split('-')[1]} | <b>${x.t}</b> ${x.desc}</div></div>`)
+            .join('') || '<div style="color:var(--dim); font-size:0.8rem">Pusto</div>';
     }
 
-    function selectDay(d) { selDate = d; document.getElementById('fDate').value = d; render(); }
-    function changeMonth(v) { curDate.setMonth(curDate.getMonth() + v); render(); }
-    function del(id) { if(confirm("Usunąć ten wpis?")) { db = db.filter(x => x.id !== id); save(); } }
+    function selectDay(d) { 
+        selDate = d; 
+        document.getElementById('fDate').value = d; 
+        render(); 
+    }
+    
+    function changeMonth(v) { 
+        curDate.setMonth(curDate.getMonth() + v); 
+        render(); 
+    }
+    
+    function del(id) { 
+        if(confirm("Usunąć ten wpis?")) { 
+            db = db.filter(x => x.id !== id); 
+            save(); 
+        } 
+    }
 
     window.onload = () => {
         document.getElementById('fDate').value = selDate;
