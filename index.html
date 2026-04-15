@@ -48,7 +48,6 @@
             transition: var(--transition);
         }
 
-        /* --- KALENDARZ --- */
         .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
         .month-label { font-weight: 800; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
         .nav-btn { background: none; border: none; color: var(--accent-blue); cursor: pointer; font-size: 1.2rem; }
@@ -63,7 +62,6 @@
         .day.selected { background: var(--accent-blue); color: white; box-shadow: 0 0 15px rgba(59,130,246,0.5); font-weight: 800; }
         .dot { width: 4px; height: 4px; background: var(--lig-red); border-radius: 50%; position: absolute; bottom: 4px; }
 
-        /* --- FORMULARZ --- */
         .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .modern-input {
             flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-card);
@@ -76,22 +74,21 @@
             margin-top: 10px; box-shadow: 0 8px 15px rgba(59,130,246,0.3);
         }
 
-        /* --- LISTA --- */
         .section-title { font-weight: 800; font-size: 0.9rem; margin-bottom: 15px; color: var(--text-dim); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
         .event-item {
             background: rgba(255,255,255,0.03); padding: 12px 15px; border-radius: 15px;
             margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
             border: 1px solid var(--border-card);
         }
-        .event-info { display: flex; align-items: center; gap: 12px; }
-        .event-time { font-weight: 800; color: var(--accent-blue); font-size: 0.95rem; }
-        .event-text { font-weight: 600; font-size: 0.9rem; }
-        .del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-weight: 800; opacity: 0.3; transition: 0.2s; }
+        .event-info { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+        .event-time { font-weight: 800; color: var(--accent-blue); font-size: 0.95rem; min-width: 45px; }
+        .event-text { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-weight: 800; opacity: 0.3; transition: 0.2s; padding: 5px; }
         .del-btn:hover { opacity: 1; }
 
         #loader {
             position: fixed; top: 10px; right: 10px; font-size: 0.6rem; color: var(--accent-blue);
-            font-weight: 800; display: none;
+            font-weight: 800; display: none; z-index: 100;
         }
     </style>
 </head>
@@ -100,7 +97,6 @@
 <div id="loader">SYNCHRONIZACJA...</div>
 
 <div class="app-container">
-    
     <div style="display: flex; flex-direction: column; gap: 20px;">
         <div class="glass-card">
             <div class="header-row">
@@ -126,7 +122,7 @@
                 <input type="date" id="fDate" class="modern-input">
                 <input type="time" id="fTime" class="modern-input" value="18:00">
             </div>
-            <input type="text" id="fDesc" class="modern-input" placeholder="Co gramy? (np. Trening, Sparing, Liga)">
+            <input type="text" id="fDesc" class="modern-input" placeholder="Co gramy? (np. Trening, Liga)">
             <button class="btn-save" id="saveBtn" onclick="save()">Zapisz w Arkuszu</button>
         </div>
 
@@ -135,23 +131,42 @@
             <div id="dayList"></div>
         </div>
     </div>
-
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNiKrC-RFHrTwkh_jp8WvSsgYWL0AiDq1DTwRWQxES9_IPiVEXBaRPka-zYYu_TTg8/exec";
+    const SCRIPT_URL = "TWÓJ_URL_DO_SCRIPTU_GOOGLE"; // <--- WKLEJ TUTAJ SWÓJ URL
     
     let db = [];
     let curViewDate = new Date();
     let curSelDate = new Date().toISOString().split('T')[0];
 
+    // Funkcja czyszcząca formaty z Arkusza (Klucz do naprawy)
+    function cleanData(val, type) {
+        if (!val) return "";
+        let s = String(val);
+        if (type === 'date') {
+            // Próba wycięcia tylko YYYY-MM-DD jeśli arkusz wysłał pełne ISO
+            return s.includes('T') ? s.split('T')[0] : s;
+        }
+        if (type === 'time') {
+            // Wycinamy tylko HH:mm
+            return s.length > 5 ? s.substring(0, 5) : s;
+        }
+        return s;
+    }
+
     async function load() {
         document.getElementById('loader').style.display = 'block';
         try {
             const r = await fetch(SCRIPT_URL + "?t=" + Date.now());
-            const text = await r.text();
-            const data = JSON.parse(text);
-            db = data.map(x => ({ id: x[0], d: x[1], t: x[2], desc: x[3] }));
+            const data = await r.json();
+            // Mapowanie z czyszczeniem typów danych
+            db = data.map(x => ({ 
+                id: x[0], 
+                d: cleanData(x[1], 'date'), 
+                t: cleanData(x[2], 'time'), 
+                desc: x[3] 
+            }));
             render();
         } catch(e) { console.error("Błąd pobierania", e); }
         document.getElementById('loader').style.display = 'none';
@@ -190,8 +205,6 @@
     function render() {
         const cal = document.getElementById('calendar');
         const my = document.getElementById('monthYear');
-        
-        // Czyścimy dni (zostawiamy nagłówki Pn-Nd)
         const days = cal.querySelectorAll('.day');
         days.forEach(d => d.remove());
 
@@ -209,7 +222,6 @@
             cal.innerHTML += `<div class="day ${sel}" onclick="selectDay('${dStr}')">${i}${has?'<div class="dot"></div>':''}</div>`;
         }
 
-        // Listy
         document.getElementById('dayList').innerHTML = db.filter(x => x.d === curSelDate).sort((a,b)=>a.t.localeCompare(b.t)).map(x => `
             <div class="event-item">
                 <div class="event-info"><span class="event-time">${x.t}</span><span class="event-text">${x.desc}</span></div>
@@ -217,7 +229,8 @@
             </div>
         `).join('') || '<div style="color:var(--text-dim); font-size:0.8rem">Brak planów</div>';
 
-        document.getElementById('monthList').innerHTML = db.filter(x => x.d.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).sort((a,b)=>a.d.localeCompare(b.d)).map(x => `
+        const currentMonthPrefix = `${y}-${String(m+1).padStart(2,'0')}`;
+        document.getElementById('monthList').innerHTML = db.filter(x => x.d.startsWith(currentMonthPrefix)).sort((a,b)=>a.d.localeCompare(b.d) || a.t.localeCompare(b.t)).map(x => `
             <div class="event-item" onclick="selectDay('${x.d}')" style="cursor:pointer">
                 <div class="event-info"><span style="color:var(--text-dim); font-size:0.7rem; width:20px">${x.d.split('-')[2]}</span><span class="event-text" style="font-size:0.8rem">${x.desc}</span></div>
                 <span style="font-size:0.7rem; color:var(--accent-blue)">${x.t}</span>
