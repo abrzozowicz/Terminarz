@@ -3,84 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Darts Master Planner</title>
+    <title>Darts Master Planner Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0f111a;
-            --card: rgba(26, 29, 46, 0.8);
+            --card: rgba(26, 29, 46, 0.9);
             --accent: #3b82f6;
             --text: #f8fafc;
             --dim: #94a3b8;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0; padding: 15px; min-height: 100vh;
+            background: var(--bg); background-image: radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
+            color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 15px; min-height: 100vh;
         }
         .app-container { width: 100%; max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 768px) { .app-container { grid-template-columns: 1fr; } }
         
         .glass-card {
-            background: var(--card); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
-        .view-switcher { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; justify-content: space-between; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .view-switcher { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day {
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 8px; font-size: 0.8rem; cursor: pointer; background: rgba(255,255,255,0.05); position: relative;
+            border-radius: 10px; font-size: 0.85rem; cursor: pointer; background: rgba(255,255,255,0.03); position: relative; transition: 0.2s;
         }
-        .day.selected { background: var(--accent); font-weight: 800; }
-        .dot { width: 4px; height: 4px; background: #ef4444; border-radius: 50%; position: absolute; bottom: 3px; }
+        .day.selected { background: var(--accent); font-weight: 800; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        .dot { width: 5px; height: 5px; background: #ef4444; border-radius: 50%; position: absolute; bottom: 4px; }
         
-        input { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px; color: white; width: 100%; margin-bottom: 10px; }
-        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 800; cursor: pointer; }
+        input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: white; width: 100%; margin-bottom: 10px; font-family: inherit; }
+        .btn { background: linear-gradient(135deg, var(--accent), #1d4ed8); color: white; border: none; padding: 15px; border-radius: 14px; width: 100%; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); }
         
         .event-item {
-            background: rgba(255,255,255,0.03); padding: 10px; border-radius: 12px; margin-bottom: 8px;
+            background: rgba(255,255,255,0.03); padding: 12px; border-radius: 14px; margin-bottom: 8px;
             display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);
         }
-        .loader { text-align: center; color: var(--accent); font-size: 0.7rem; font-weight: 800; margin-bottom: 10px; display: none; }
+        .loader { text-align: center; color: var(--accent); font-size: 0.75rem; font-weight: 800; margin-bottom: 15px; display: none; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-<div id="loader" class="loader">SYNCHRONIZACJA Z GOOGLE...</div>
+<div id="loader" class="loader">SYNCHRONIZACJA Z ARKUSZEM...</div>
 
 <div class="app-container">
-    <div>
+    <div class="left-col">
         <div class="glass-card">
             <div class="view-switcher">
-                <button onclick="changeMonth(-1)" style="background:none; border:none; color:white; cursor:pointer">❮</button>
-                <div id="monthYear" style="font-weight:800; font-size:0.9rem"></div>
-                <button onclick="changeMonth(1)" style="background:none; border:none; color:white; cursor:pointer">❯</button>
+                <button onclick="changeMonth(-1)" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer">❮</button>
+                <div id="monthYear" style="font-weight:800; letter-spacing:1px"></div>
+                <button onclick="changeMonth(1)" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer">❯</button>
             </div>
             <div class="grid" id="calendar"></div>
         </div>
+        
         <div class="glass-card" style="margin-top:20px;">
-            <div style="font-size:0.7rem; font-weight:800; color:var(--dim); margin-bottom:10px">PLANY NA MIESIĄC</div>
+            <div style="font-size:0.7rem; font-weight:800; color:var(--dim); margin-bottom:12px; text-transform:uppercase">Widok miesięczny</div>
             <div id="monthList"></div>
         </div>
     </div>
 
-    <div>
+    <div class="right-col">
         <div class="glass-card">
-            <div style="font-weight:800; margin-bottom:15px">DODAJ WYDARZENIE</div>
+            <div style="font-weight:800; margin-bottom:15px; color:var(--accent)">DODAJ WPIS</div>
             <input type="date" id="fDate">
             <input type="time" id="fTime" value="18:00">
-            <input type="text" id="fDesc" placeholder="Co gramy?">
-            <button class="btn" id="saveBtn" onclick="save()">Zapisz w Arkuszu</button>
+            <input type="text" id="fDesc" placeholder="Co gramy dzisiaj?">
+            <button class="btn" id="saveBtn" onclick="save()">Zapisz w Google Sheets</button>
         </div>
+        
         <div class="glass-card" style="margin-top:20px;">
-            <div id="selDateLabel" style="font-size:0.7rem; font-weight:800; color:var(--dim); margin-bottom:10px">DZISIEJSZE MECZE</div>
+            <div id="selDateLabel" style="font-size:0.7rem; font-weight:800; color:var(--dim); margin-bottom:12px; text-transform:uppercase">Plan dnia</div>
             <div id="dayList"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- PODMIEŃ LINK PONIŻEJ ---
+    // Twój aktualny link do skryptu Google
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNiKrC-RFHrTwkh_jp8WvSsgYWL0AiDq1DTwRWQxES9_IPiVEXBaRPka-zYYu_TTg8/exec";
 
     let db = [];
@@ -94,34 +97,51 @@
             const d = await r.json();
             db = d.map(x => ({ id: x[0], d: x[1], t: x[2], desc: x[3] }));
             render();
-        } catch(e) { console.log("Load error", e); }
+        } catch(e) { console.error("Błąd pobierania", e); }
         document.getElementById('loader').style.display = 'none';
     }
 
     async function save() {
-        const desc = document.getElementById('fDesc').value;
-        const date = document.getElementById('fDate').value;
-        const time = document.getElementById('fTime').value;
-        if(!desc) return alert("Wpisz opis!");
+        const descInput = document.getElementById('fDesc');
+        const dateInput = document.getElementById('fDate');
+        const timeInput = document.getElementById('fTime');
+        if(!descInput.value) return alert("Wpisz opis wydarzenia!");
 
         const btn = document.getElementById('saveBtn');
-        btn.innerText = "ZAPISYWANIE...";
+        const originalText = btn.innerText;
+        btn.innerText = "ŁĄCZENIE...";
+        btn.disabled = true;
         
-        const newEv = { id: Date.now(), d: date, t: time, desc: desc };
+        const newEv = { 
+            id: Date.now(), 
+            d: dateInput.value, 
+            t: timeInput.value, 
+            desc: descInput.value 
+        };
+        
         db.push(newEv);
         render();
 
         try {
+            // Używamy mode: 'no-cors', aby ominąć blokady CORS przy POST do Google Script
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify({ action: 'save', events: db })
             });
+            
             btn.innerText = "ZAPISANO!";
-            document.getElementById('fDesc').value = "";
-            setTimeout(() => btn.innerText = "Zapisz w Arkuszu", 2000);
-        } catch(e) { alert("Błąd zapisu"); }
+            descInput.value = "";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }, 2000);
+        } catch(e) { 
+            alert("Błąd połączenia!");
+            btn.innerText = "SPRÓBUJ PONOWNIE";
+            btn.disabled = false;
+        }
     }
 
     function render() {
@@ -146,16 +166,28 @@
 
         const dL = document.getElementById('dayList');
         const daily = db.filter(x => x.d === selDate).sort((a,b) => a.t.localeCompare(b.t));
-        dL.innerHTML = daily.map(x => `<div class="event-item"><div><b>${x.t}</b> ${x.desc}</div><button onclick="del(${x.id})" style="background:none; border:none; color:#ef4444; cursor:pointer">✕</button></div>`).join('') || 'Brak wydarzeń';
+        dL.innerHTML = daily.map(x => `
+            <div class="event-item">
+                <div><span style="color:var(--accent); font-weight:800">${x.t}</span> ${x.desc}</div>
+                <button onclick="del(${x.id})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:800">✕</button>
+            </div>
+        `).join('') || '<div style="color:var(--dim); font-size:0.8rem">Brak planów na ten dzień</div>';
 
         const mL = document.getElementById('monthList');
         const monthly = db.filter(x => x.d.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).sort((a,b) => a.d.localeCompare(b.d));
-        mL.innerHTML = monthly.map(x => `<div class="event-item" onclick="selectDay('${x.d}')" style="cursor:pointer"><div>${x.d.split('-')[2]}.${x.d.split('-')[1]} | <b>${x.t}</b> ${x.desc}</div></div>`).join('') || 'Pusty miesiąc';
+        mL.innerHTML = monthly.map(x => `
+            <div class="event-item" onclick="selectDay('${x.d}')" style="cursor:pointer">
+                <div style="font-size:0.85rem">
+                    <span style="color:var(--dim)">${x.d.split('-')[2]}.${x.d.split('-')[1]}</span> | 
+                    <b>${x.t}</b> ${x.desc}
+                </div>
+            </div>
+        `).join('') || '<div style="color:var(--dim); font-size:0.8rem">Nic nie zaplanowano w tym miesiącu</div>';
     }
 
     function selectDay(d) { selDate = d; document.getElementById('fDate').value = d; render(); }
     function changeMonth(v) { curDate.setMonth(curDate.getMonth() + v); render(); }
-    function del(id) { if(confirm("Usunąć?")) { db = db.filter(x => x.id !== id); save(); } }
+    function del(id) { if(confirm("Usunąć ten wpis?")) { db = db.filter(x => x.id !== id); save(); } }
 
     window.onload = () => {
         document.getElementById('fDate').value = selDate;
