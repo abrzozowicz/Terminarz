@@ -2,25 +2,20 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dart Planner - Modern UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dart Planner Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- CORE STYLES (Modern UI / Dart Style) --- */
         :root {
-            /* Nowoczesna ciemna paleta z grafiki */
-            --bg-body: #0a0b12; /* Głęboka czerń */
-            --bg-card: #151825; /* Ciemnogranatowa karta */
-            --border-card: rgba(255, 255, 255, 0.05); /* Subtelna ramka */
-            
-            /* Akcenty z grafiki */
-            --accent-blue: #3b82f6; /* Niebieski Dodaj */
-            --accent-green: #34d399; /* Zielony trójkąt */
-            --text-main: #f8fafc; /* Biały główny */
-            --text-dim: #8e96b3; /* Przygaszony (ligowy) */
-            --lig-red: #ef4444; /* Liga Czerwona */
-            --lig-green: #10b981; /* Liga Zielona */
-            --neumorphic-shadow: 10px 10px 20px rgba(0,0,0,0.5), -5px -5px 15px rgba(255,255,255,0.02);
+            --bg-body: #0a0b12;
+            --bg-card: #151825;
+            --border-card: rgba(255, 255, 255, 0.05);
+            --accent-blue: #3b82f6;
+            --accent-green: #34d399;
+            --text-main: #f8fafc;
+            --text-dim: #8e96b3;
+            --lig-red: #ef4444;
+            --neumorphic: 10px 10px 20px rgba(0,0,0,0.5), -5px -5px 15px rgba(255,255,255,0.02);
             --transition: 0.3s ease;
         }
 
@@ -28,514 +23,221 @@
         
         body {
             background: var(--bg-body);
-            background-image: 
-                radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.05) 0%, transparent 40%);
+            background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
             color: var(--text-main);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        /* Tarcza rzutek - tło (Opcjonalnie dla klimatu) */
-        body::after {
-            content: ''; position: fixed; top: -50px; right: -50px; width: 300px; height: 300px;
-            background: url('https://icons.iconarchive.com/icons/google/noto-emoji-activities/512/52834-direct-hit-icon.png') no-repeat center center;
-            background-size: contain; opacity: 0.05; pointer-events: none; z-index: -1;
+            margin: 0; padding: 15px; min-height: 100vh;
         }
 
         .app-container {
-            width: 100%; max-width: 1100px; margin: 0 auto;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
+            width: 100%; max-width: 1000px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px;
         }
-        @media (max-width: 900px) { .app-container { grid-template-columns: 1fr; } }
 
-        /* --- CARDS (Modern Neumorphic/Glass) --- */
+        @media (max-width: 850px) {
+            .app-container { grid-template-columns: 1fr; }
+        }
+
         .glass-card {
             background: var(--bg-card);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--border-card);
             border-radius: 24px;
-            padding: 25px;
-            box-shadow: var(--neumorphic-shadow);
+            padding: 20px;
+            box-shadow: var(--neumorphic);
             transition: var(--transition);
-            position: relative; overflow: hidden;
         }
 
-        /* --- KALENDARZ (UI z grafiki) --- */
-        .view-switcher { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .view-label { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-main); }
-        .nav-btn { background: none; border: none; color: var(--accent-blue); cursor: pointer; font-size: 1.2rem; transition: var(--transition); }
-        .nav-btn:hover { transform: scale(1.1); }
+        /* --- KALENDARZ --- */
+        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .month-label { font-weight: 800; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-btn { background: none; border: none; color: var(--accent-blue); cursor: pointer; font-size: 1.2rem; }
 
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-name { text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; padding-bottom: 10px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day-name { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; padding-bottom: 8px; }
         .day {
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
-            transition: var(--transition); position: relative;
+            border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            transition: var(--transition); position: relative; background: rgba(255,255,255,0.02);
         }
-        
-        /* Stylizacja dni z grafiki */
-        .day.selected { background: var(--accent-blue); color: white; box-shadow: 0 0 15px rgba(59,130,246,0.6); }
-        .day.has-event { border: 2px solid #ef444450; } /* Subtelna ramka dla dni z wydarzeniami */
-        .day.lig-red { color: var(--lig-red); font-weight: 800; }
-        .day.event-circle {
-            width: 28px; height: 28px; margin: auto;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid var(--lig-red); border-radius: 50%;
-        }
+        .day.selected { background: var(--accent-blue); color: white; box-shadow: 0 0 15px rgba(59,130,246,0.5); font-weight: 800; }
+        .dot { width: 4px; height: 4px; background: var(--lig-red); border-radius: 50%; position: absolute; bottom: 4px; }
 
-        /* Zielony trójkąt na dole kalendarza */
-        .cal-footer { grid-column: 1 / -1; display: flex; justify-content: flex-end; padding-top: 15px; border-top: 1px solid var(--border-card); }
-        .triangle-total { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 15px solid var(--accent-green); position: relative; }
-        .triangle-total span { position: absolute; top: -30px; left: -10px; font-size: 0.8rem; font-weight: 800; color: var(--accent-green); }
-
-        /* --- NOWY WPIS (UI z grafiki) --- */
-        .form-section { padding: 5px 0; }
-        .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .form-title { font-weight: 800; font-size: 1.1rem; color: var(--accent-blue); text-transform: uppercase; }
-        .form-add-icon { font-size: 1.2rem; background: var(--accent-blue); color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 5px 10px rgba(59,130,246,0.3); }
-
-        .input-group { display: flex; gap: 15px; margin-bottom: 15px; }
+        /* --- FORMULARZ --- */
+        .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .modern-input {
-            flex: 1; background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-card); border-radius: 12px;
-            padding: 14px; color: var(--text-main); font-family: inherit; font-size: 0.85rem;
-            transition: var(--transition); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+            flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-card);
+            border-radius: 12px; padding: 12px; color: white; font-family: inherit; font-size: 0.9rem;
         }
-        .modern-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(59,130,246,0.3); }
-
-        .form-select {
-            appearance: none; background: rgba(0,0,0,0.2) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 15px center;
-            background-size: 12px;
-        }
-
-        .btn-modern-save {
+        .btn-save {
             background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-            color: white; border: none; padding: 15px; border-radius: 14px;
-            width: 100%; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer; transition: var(--transition); box-shadow: 0 10px 20px rgba(59,130,246,0.4);
+            color: white; border: none; padding: 14px; border-radius: 12px;
+            width: 100%; font-weight: 800; text-transform: uppercase; cursor: pointer;
+            margin-top: 10px; box-shadow: 0 8px 15px rgba(59,130,246,0.3);
         }
-        .btn-modern-save:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(59,130,246,0.5); }
-        .btn-modern-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* --- HARMONOGRAM LISTA (Layout modern) --- */
-        .sched-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .sched-num { background: #ef4444; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; font-size: 0.9rem; }
-        .sched-title { font-weight: 800; font-size: 1rem; color: var(--text-main); text-transform: uppercase; }
-
-        .modern-event-list { display: flex; flex-direction: column; gap: 15px; }
-        .event-card-item {
-            display: flex; align-items: flex-start; gap: 15px;
-            background: rgba(255,255,255,0.02);
-            padding: 15px 20px; border-radius: 16px; border: 1px solid var(--border-card);
-            transition: var(--transition); position: relative;
+        /* --- LISTA --- */
+        .section-title { font-weight: 800; font-size: 0.9rem; margin-bottom: 15px; color: var(--text-dim); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .event-item {
+            background: rgba(255,255,255,0.03); padding: 12px 15px; border-radius: 15px;
+            margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
+            border: 1px solid var(--border-card);
         }
-        .event-card-item:hover { border-color: rgba(255, 255, 255, 0.1); transform: translateX(3px); }
+        .event-info { display: flex; align-items: center; gap: 12px; }
+        .event-time { font-weight: 800; color: var(--accent-blue); font-size: 0.95rem; }
+        .event-text { font-weight: 600; font-size: 0.9rem; }
+        .del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-weight: 800; opacity: 0.3; transition: 0.2s; }
+        .del-btn:hover { opacity: 1; }
 
-        .time-box { font-size: 1.1rem; font-weight: 800; color: var(--text-main); white-space: nowrap; }
-        .time-box.lig-red { color: var(--lig-red); }
-        .time-box.lig-green { color: var(--lig-green); }
-
-        .event-divider { width: 2px; height: 35px; background: rgba(255, 255, 255, 0.1); }
-        
-        .event-details { flex-grow: 1; }
-        .event-main-desc { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; color: var(--text-main); }
-        .event-sub-desc { font-size: 0.75rem; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
-        
-        /* Ikony kolorów dla lig */
-        .lig-icon { width: 10px; height: 10px; border-radius: 50%; }
-        .lig-icon.red { background: var(--lig-red); }
-        .lig-icon.green { background: var(--lig-green); }
-
-        .del-modern-btn {
-            background: none; border: none; color: rgba(255, 255, 255, 0.1); font-size: 1.2rem; font-weight: 800; cursor: pointer;
-            position: absolute; top: 15px; right: 15px; transition: var(--transition);
+        #loader {
+            position: fixed; top: 10px; right: 10px; font-size: 0.6rem; color: var(--accent-blue);
+            font-weight: 800; display: none;
         }
-        .del-modern-btn:hover { color: var(--lig-red); transform: scale(1.1); }
-
-        /* --- LOADER (Nowoczesny) --- */
-        .loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-            display: none; align-items: center; justify-content: center; z-index: 1000;
-        }
-        .spinner {
-            width: 40px; height: 40px; border: 4px solid var(--border-card);
-            border-top: 4px solid var(--accent-blue); border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
     </style>
 </head>
 <body>
 
-<div class="loader-overlay" id="loader">
-    <div class="spinner"></div>
-</div>
+<div id="loader">SYNCHRONIZACJA...</div>
 
 <div class="app-container">
     
-    <div class="left-section modern-event-list">
-        
+    <div style="display: flex; flex-direction: column; gap: 20px;">
         <div class="glass-card">
-            <div class="view-switcher sched-header">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
-                    <div id="monthYear" class="view-label"></div>
-                    <button class="nav-btn" onclick="changeMonth(1)">❯</button>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <span style="color:var(--text-dim); font-size:1.1rem">🔍</span>
-                    <span style="color:var(--text-dim); font-size:1.1rem">+</span>
-                </div>
+            <div class="header-row">
+                <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
+                <div id="monthYear" class="month-label"></div>
+                <button class="nav-btn" onclick="changeMonth(1)">❯</button>
             </div>
-            
-            <div class="cal-grid" id="calendarGrid">
+            <div class="cal-grid" id="calendar">
                 <div class="day-name">Pn</div><div class="day-name">Wt</div><div class="day-name">Śr</div><div class="day-name">Cz</div><div class="day-name">Pt</div><div class="day-name">Sb</div><div class="day-name">Nd</div>
-                </div>
-            
-            <div class="cal-footer">
-                <div class="triangle-total">
-                    <span id="monthlyTotalCount">0</span>
-                </div>
             </div>
         </div>
 
         <div class="glass-card">
-            <div class="sched-header">
-                <div class="sched-num" style="background:var(--accent-blue); width: auto; padding: 0 8px;">📊</div>
-                <div class="sched-title">Przegląd miesiąca</div>
-            </div>
-            <div id="monthEventList" class="modern-event-list">
-                </div>
+            <div class="section-title"><span>📊</span> Przegląd miesiąca</div>
+            <div id="monthList"></div>
         </div>
     </div>
 
-    <div class="right-section modern-event-list">
-        
+    <div style="display: flex; flex-direction: column; gap: 20px;">
         <div class="glass-card">
-            <div class="form-header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="color:var(--accent-blue); font-size:1.2rem; transform: rotate(45deg);">🎯</span>
-                    <div class="form-title">Nowe wydarzenie</div>
-                </div>
-                <div class="form-add-icon">＋</div>
+            <div class="section-title" style="color: var(--accent-blue);"><span>🎯</span> Nowe wydarzenie</div>
+            <div class="input-row">
+                <input type="date" id="fDate" class="modern-input">
+                <input type="time" id="fTime" class="modern-input" value="18:00">
             </div>
-            
-            <input type="hidden" id="eId"> <div class="form-section">
-                <div class="input-group">
-                    <input type="date" id="fDate" class="modern-input">
-                    <input type="time" id="fTime" class="modern-input modern-time" value="18:00">
-                </div>
-                
-                <select id="fDesc" class="modern-input modern-select form-select">
-                    <option value="" disabled selected>Co dzisiaj gramy?</option>
-                    <option value="🎯 Sparing treningowy (Domowy)"> Sparing treningowy (Domowy)</option>
-                    <option value="🎯 Trening celności (Domowy)"> Trening celności (Domowy)</option>
-                    <option value="🔴 Trening w klubie (Liga Czerwona)">⚪ Trening w klubie (Liga Czerwona)</option>
-                    <option value="🟢 Turniej klubowy (Liga Zielona)">⚫ Turniej klubowy (Liga Zielona)</option>
-                    <option value="🏆 Turniej tygodnia (Poważnie)">🏆 Turniej tygodnia (Poważnie)</option>
-                    <option value="⚽ Piwko i gra towarzyska">🍺 Piwko i gra towarzyska</option>
-                </select>
-                
-                <button class="btn-modern-save" id="saveBtn" onclick="save()">Zapisz</button>
-            </div>
-        </div>
-
-        <div style="display:flex; justify-content:center; gap:20px; opacity:0.1; transform:scale(0.8); margin-bottom:10px;">
-             <span style="color:red; font-size:2rem">🎯</span> <span style="color:blue; font-size:2rem">🎯</span> <span style="color:green; font-size:2rem">🎯</span> <span style="color:black; font-size:2rem">🎯</span>
+            <input type="text" id="fDesc" class="modern-input" placeholder="Co gramy? (np. Trening, Sparing, Liga)">
+            <button class="btn-save" id="saveBtn" onclick="save()">Zapisz w Arkuszu</button>
         </div>
 
         <div class="glass-card">
-            <div class="sched-header">
-                <div class="sched-num" id="dayEventCount">0</div>
-                <div class="sched-title">Meczowy plan dnia</div>
-            </div>
-            <div id="dayEventList" class="modern-event-list">
-                </div>
+            <div class="section-title"><span>📅</span> Plan dnia</div>
+            <div id="dayList"></div>
         </div>
     </div>
 
 </div>
 
 <script>
-    /* --- KONFIGURACJA (Backend Link - Twój działający URL) --- */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNiKrC-RFHrTwkh_jp8WvSsgYWL0AiDq1DTwRWQxES9_IPiVEXBaRPka-zYYu_TTg8/exec"; 
-
-    // Baza danych w pamięci
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNiKrC-RFHrTwkh_jp8WvSsgYWL0AiDq1DTwRWQxES9_IPiVEXBaRPka-zYYu_TTg8/exec";
+    
     let db = [];
-    let curViewDate = new Date(); // Miesiąc, który oglądamy
-    let curSelDate = new Date().toISOString().split('T')[0]; // Data wybrana kółkiem
+    let curViewDate = new Date();
+    let curSelDate = new Date().toISOString().split('T')[0];
 
-    // --- POBIERANIE (GET) ---
-    async function loadData() {
-        document.getElementById('loader').style.display = 'flex';
+    async function load() {
+        document.getElementById('loader').style.display = 'block';
         try {
-            // Unikamy cache, żeby dane od razu wpadały
-            const response = await fetch(SCRIPT_URL + "?cache=" + Date.now());
-            const text = await response.text();
-            
-            // Logika odczytu z Twojego działającego kodu
-            let d;
-            try { d = JSON.parse(text); } 
-            catch(err) { d = (text === "OK" || !text) ? [] : []; }
-            
-            if(!Array.isArray(d)) d = [];
-            
-            // Mapujemy wiersze z Arkusza (ID, Data, Godzina, Opis)
-            db = d.map(r => ({ id: r[0], d: r[1], t: r[2], desc: r[3] }));
-            console.log("Dane załadowane:", db);
-            
+            const r = await fetch(SCRIPT_URL + "?t=" + Date.now());
+            const text = await r.text();
+            const data = JSON.parse(text);
+            db = data.map(x => ({ id: x[0], d: x[1], t: x[2], desc: x[3] }));
             render();
-        } catch (e) {
-            console.error("Błąd ładowania danych", e);
-            alert("Nie udało się połączyć z bazą Dart!");
-        }
+        } catch(e) { console.error("Błąd pobierania", e); }
         document.getElementById('loader').style.display = 'none';
     }
 
-    // --- ZAPISYWANIE (POST) ---
     async function save() {
         const descInput = document.getElementById('fDesc');
-        const descText = descInput.options[descInput.selectedIndex].text;
-        
-        if(!descInput.value) return alert("Wybierz typ wydarzenia!");
+        if(!descInput.value) return alert("Wpisz opis!");
 
         const btn = document.getElementById('saveBtn');
-        const originalText = btn.innerText;
-        btn.innerText = "SYNCHRONIZACJA...";
+        btn.innerText = "ZAPISYWANIE...";
         btn.disabled = true;
 
-        const dateInput = document.getElementById('fDate').value;
-        
-        // Budujemy obiekt wydarzenia
-        const newEvent = {
-            id: document.getElementById('eId').value || Date.now(), // Unikalne ID
-            d: dateInput, // Data YYYY-MM-DD
-            t: document.getElementById('fTime').value, // Godzina HH:MM
-            desc: descInput.value // Pełny opis z emoji
+        const newEv = { 
+            id: Date.now(), 
+            d: document.getElementById('fDate').value, 
+            t: document.getElementById('fTime').value, 
+            desc: descInput.value 
         };
         
-        // Aktualizacja lokalna dla płynności
-        const idx = db.findIndex(x => x.id == newEvent.id);
-        if(idx > -1) db[idx] = newEvent; 
-        else db.push(newEvent);
-        
-        render(); // Od razu renderujemy zmiany lokalne
-        
-        // Wysyłamy do Google Apps Script
+        db.push(newEv);
+        render();
+
         try {
-            // Używamy mode: 'no-cors' - Twój działający sposób
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify({ action: 'save', events: db })
             });
-            
-            btn.innerText = "ZAPISANO DART!";
-            descInput.value = ""; // Czyścimy form
-            setTimeout(() => { 
-                btn.innerText = originalText; 
-                btn.disabled = false;
-            }, 2000);
-            
-        } catch (e) {
-            alert("Błąd połączenia z backendem. Darty nie wyleciały!");
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
+            btn.innerText = "ZAPISANO!";
+            descInput.value = "";
+            setTimeout(() => { btn.innerText = "Zapisz w Arkuszu"; btn.disabled = false; }, 2000);
+        } catch(e) { alert("Błąd zapisu!"); btn.disabled = false; }
     }
 
-    // --- USUWANIE ---
-    function deleteEvent(id) {
-        if(!confirm("Usunąć ten turniej/trening z planu?")) return;
+    function render() {
+        const cal = document.getElementById('calendar');
+        const my = document.getElementById('monthYear');
         
-        // Lokalna aktualizacja
-        db = db.filter(x => x.id != id);
-        render();
-        
-        // Zapisujemy nową bazę do Google
-        saveSilently(); 
+        // Czyścimy dni (zostawiamy nagłówki Pn-Nd)
+        const days = cal.querySelectorAll('.day');
+        days.forEach(d => d.remove());
+
+        const y = curViewDate.getFullYear(), m = curViewDate.getMonth();
+        my.innerText = curViewDate.toLocaleString('pl', { month: 'long', year: 'numeric' });
+
+        const first = (new Date(y, m, 1).getDay() || 7) - 1;
+        const last = new Date(y, m+1, 0).getDate();
+
+        for(let i=0; i<first; i++) cal.innerHTML += '<div class="day empty" style="background:none; cursor:default"></div>';
+        for(let i=1; i<=last; i++) {
+            const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+            const has = db.some(x => x.d === dStr);
+            const sel = dStr === curSelDate ? 'selected' : '';
+            cal.innerHTML += `<div class="day ${sel}" onclick="selectDay('${dStr}')">${i}${has?'<div class="dot"></div>':''}</div>`;
+        }
+
+        // Listy
+        document.getElementById('dayList').innerHTML = db.filter(x => x.d === curSelDate).sort((a,b)=>a.t.localeCompare(b.t)).map(x => `
+            <div class="event-item">
+                <div class="event-info"><span class="event-time">${x.t}</span><span class="event-text">${x.desc}</span></div>
+                <button class="del-btn" onclick="del(${x.id})">✕</button>
+            </div>
+        `).join('') || '<div style="color:var(--text-dim); font-size:0.8rem">Brak planów</div>';
+
+        document.getElementById('monthList').innerHTML = db.filter(x => x.d.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).sort((a,b)=>a.d.localeCompare(b.d)).map(x => `
+            <div class="event-item" onclick="selectDay('${x.d}')" style="cursor:pointer">
+                <div class="event-info"><span style="color:var(--text-dim); font-size:0.7rem; width:20px">${x.d.split('-')[2]}</span><span class="event-text" style="font-size:0.8rem">${x.desc}</span></div>
+                <span style="font-size:0.7rem; color:var(--accent-blue)">${x.t}</span>
+            </div>
+        `).join('') || '<div style="color:var(--text-dim); font-size:0.8rem">Pusto w tym miesiącu</div>';
     }
+
+    function selectDay(d) { curSelDate = d; document.getElementById('fDate').value = d; render(); }
+    function changeMonth(v) { curViewDate.setMonth(curViewDate.getMonth() + v); render(); }
+    function del(id) { if(confirm("Usunąć?")) { db = db.filter(x => x.id !== id); saveSilently(); } }
 
     async function saveSilently() {
-        document.getElementById('loader').style.display = 'flex';
-        try {
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', events: db }) });
-        } catch (e) { console.error("Błąd cichego zapisu", e); }
-        document.getElementById('loader').style.display = 'none';
+        render();
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', events: db }) });
     }
 
-    // --- RENDEROWANIE INTERFEJSU (Klucz modern) ---
-    function render() {
-        renderCalendar();
-        renderDayList();
-        renderMonthList();
-    }
-
-    // 1. Kalendarz (Odtworzenie UI z grafiki)
-    function renderCalendar() {
-        const grid = document.getElementById('calendarGrid');
-        const monthYearLabel = document.getElementById('monthYear');
-        const totalCountLabel = document.getElementById('monthlyTotalCount');
-
-        // Czyścimy dni (zostawiamy nazwy dni Pn...Nd, które są statyczne w HTML)
-        const daysInHTML = grid.querySelectorAll('.day');
-        daysInHTML.forEach(d => d.remove());
-        
-        const y = curViewDate.getFullYear();
-        const m = curViewDate.getMonth();
-        
-        monthYearLabel.innerText = curViewDate.toLocaleString('pl', { month: 'long', year: 'numeric' }).toUpperCase();
-        
-        // Obliczenia dni miesiąca
-        const firstDayOfMonth = (new Date(y, m, 1).getDay() || 7) - 1; // 0=Pn, 6=Nd
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        
-        let eventsInMonthCount = 0;
-
-        // Puste dni na początku
-        for(let i=0; i<firstDayOfMonth; i++) grid.innerHTML += `<div class="day empty"></div>`;
-        
-        // Budujemy dni
-        for(let i=1; i<=daysInMonth; i++) {
-            const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-            const hasEvent = db.some(e => e.d === dateStr);
-            const isSelected = dateStr === curSelDate;
-            
-            let dayClass = 'day';
-            if(isSelected) dayClass += ' selected';
-            if(hasEvent) dayClass += ' has-event';
-            
-            // Odtworzenie kolorowych lig z grafiki (Przykład dla 2024-05-06 z grafiki)
-            // Możemy dodać logikę w opisie, np. słowo "Czerwona" = red
-            let ligStyle = '';
-            if(hasEvent) {
-                eventsInMonthCount++;
-                // Prosta heurystyka lig: jeśli Trening, Czerwona, jeśli Turniej, Zielona
-                const event = db.find(e => e.d === dateStr);
-                if(event.desc.includes('Czerwona')) ligStyle = 'lig-red';
-                else if(event.desc.includes('Zielona')) ligStyle = 'lig-green';
-            }
-
-            // Dni specjalne z grafiki (Czerwone numery: 29, 19, 25, 23, 8, 10, 16)
-            const specialRedDays = [29, 19, 25, 23, 8, 10, 16];
-            if(specialRedDays.includes(i) && m == 4 && y == 2024) ligStyle = 'day-lig-red'; // Przykład dla konkretnego miesiąca z grafiki
-
-            // Odtworzenie kółka z grafiki dla dni z wydarzeniami
-            const dayHTML = isSelected 
-                ? i 
-                : (hasEvent 
-                    ? `<div class="event-circle ${ligStyle}">${i}</div>` 
-                    : `<span class="${ligStyle}">${i}</span>`);
-
-            grid.innerHTML += `<div class="${dayClass}" onclick="onDayClick('${dateStr}')">${dayHTML}</div>`;
-        }
-
-        totalCountLabel.innerText = eventsInMonthCount; // Stopka z trójkątem
-    }
-
-    // 2. Lista Planu Dnia (UI modern)
-    function renderDayList() {
-        const listContainer = document.getElementById('dayEventList');
-        const countLabel = document.getElementById('dayEventCount');
-        
-        // Filtrujemy wydarzenia dla wybranej daty i sortujemy godziną
-        const dailyEvents = db.filter(e => e.d === curSelDate).sort((a,b)=>a.t.localeCompare(b.t));
-        countLabel.innerText = dailyEvents.length;
-        
-        listContainer.innerHTML = ''; // Czyścimy
-
-        if(dailyEvents.length === 0) {
-            listContainer.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.8rem">Brak planów darta na dziś. Może sparing?</div>';
-            return;
-        }
-
-        dailyEvents.forEach(ev => {
-            let timeStyle = 'time-box';
-            let ligColorClass = 'lig-icon';
-            if(ev.desc.includes('Czerwona')) { timeStyle += ' lig-red'; ligColorClass += ' red'; }
-            else if(ev.desc.includes('Zielona')) { timeStyle += ' lig-green'; ligColorClass += ' green'; }
-
-            const item = `
-                <div class="event-card-item glass-card">
-                    <div class="${timeStyle}">${ev.t}</div>
-                    <div class="event-divider"></div>
-                    <div class="event-details">
-                        <div class="event-main-desc">${ev.desc.split('(')[0].trim()}</div>
-                        <div class="event-sub-desc">
-                            <div class="${ligColorClass}"></div>
-                            ${ev.desc.split('(')[1] ? ev.desc.split('(')[1].replace(')','') : 'Darta plan'}
-                        </div>
-                    </div>
-                    <button class="del-modern-btn" onclick="deleteEvent(${ev.id})">✕</button>
-                </div>
-            `;
-            listContainer.innerHTML += item;
-        });
-    }
-
-    // 3. Przegląd Miesięczny (UI Modern)
-    function renderMonthList() {
-        const listContainer = document.getElementById('monthEventList');
-        
-        const y = curViewDate.getFullYear();
-        const m = curViewDate.getMonth();
-        
-        // Filtrujemy dla miesiąca
-        const monthlyEvents = db.filter(e => e.d.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).sort((a,b)=>a.d.localeCompare(b.d));
-        
-        listContainer.innerHTML = ''; // Czyścimy
-
-        if(monthlyEvents.length === 0) {
-            listContainer.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.8rem">Nudny miesiąc... Żadnych turniejów?</div>';
-            return;
-        }
-
-        monthlyEvents.forEach(ev => {
-            const item = `
-                <div class="event-card-item glass-card" onclick="onDayClick('${ev.d}')" style="cursor:pointer">
-                    <div style="font-weight:800; min-width:30px; color:var(--lig-red);">${ev.d.split('-')[2]}</div>
-                    <div class="event-divider" style="height:25px; margin:0 10px;"></div>
-                    <div class="event-details">
-                        <div class="event-main-desc" style="font-size:0.8rem">${ev.desc.split('(')[0].trim()}</div>
-                        <div class="event-sub-desc" style="font-size:0.7rem">${ev.t}</div>
-                    </div>
-                </div>
-            `;
-            listContainer.innerHTML += item;
-        });
-    }
-
-    // --- LOGIKA KLIKNIĘĆ ---
-    function onDayClick(dateStr) {
-        if(!dateStr) return; // Kliknięcie pustego dnia
-        curSelDate = dateStr;
-        // Ustawiamy datę w formularzu
-        document.getElementById('fDate').value = dateStr;
-        // Wymuszamy podświetlenie formularza (subtelne)
-        const formCard = document.getElementById('saveBtn').closest('.glass-card');
-        formCard.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.4)';
-        setTimeout(() => formCard.style.boxShadow = 'var(--neumorphic-shadow)', 500);
-
-        render(); // Przerenderuj wszystko (podświetl kółko w kalendarzu)
-    }
-
-    function changeMonth(s) { curViewDate.setMonth(curViewDate.getMonth() + s); renderCalendar(); renderMonthList(); }
-
-    // --- START ---
     window.onload = () => {
-        // Ustawiamy domyślną datę w formularzu
         document.getElementById('fDate').value = curSelDate;
-        loadData(); // Ładuj dane z Google przy starcie
+        load();
     };
-
 </script>
 </body>
 </html>
