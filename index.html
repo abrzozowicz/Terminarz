@@ -11,7 +11,6 @@
             --bg-card: #151825;
             --border-card: rgba(255, 255, 255, 0.05);
             --accent-blue: #3b82f6;
-            --accent-green: #34d399;
             --text-main: #f8fafc;
             --text-dim: #8e96b3;
             --lig-red: #ef4444;
@@ -84,7 +83,7 @@
 <div id="loader">SYNCHRONIZACJA...</div>
 
 <div class="app-container">
-    <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div>
         <div class="glass-card">
             <div class="header-row">
                 <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
@@ -95,14 +94,14 @@
                 <div class="day-name">Pn</div><div class="day-name">Wt</div><div class="day-name">Śr</div><div class="day-name">Cz</div><div class="day-name">Pt</div><div class="day-name">Sb</div><div class="day-name">Nd</div>
             </div>
         </div>
-
+        <br>
         <div class="glass-card">
             <div class="section-title"><span>📊</span> Przegląd miesiąca</div>
             <div id="monthList"></div>
         </div>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div>
         <div class="glass-card">
             <div class="section-title" style="color: var(--accent-blue);"><span>🎯</span> Nowe wydarzenie</div>
             <div class="input-row">
@@ -112,42 +111,34 @@
             <input type="text" id="fDesc" class="modern-input" placeholder="Co gramy? (np. Trening, Liga)">
             <button class="btn-save" id="saveBtn" onclick="save()">Zapisz w Arkuszu</button>
         </div>
-
+        <br>
         <div class="glass-card">
-            <div class="section-title"><span>📅</span> Plan dnia <span id="selectedDayLabel" style="margin-left:auto; color:var(--accent-blue); font-size:0.7rem"></span></div>
+            <div class="section-title"><span>📅</span> Plan dnia <span id="selLabel" style="margin-left:auto; font-size:0.7rem; color:var(--accent-blue)"></span></div>
             <div id="dayList"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- TUTAJ WKLEJ SWÓJ URL Z GOOGLE APPS SCRIPT ---
+    // --- TUTAJ WKLEJ LINK, KTÓRY TERAZ WYŚWIETLA CI KOD ---
     const SCRIPT_URL = "TWÓJ_URL_DO_SCRIPTU_GOOGLE"; 
     
     let db = [];
     let curViewDate = new Date();
     let curSelDate = new Date().toISOString().split('T')[0];
 
-    // Funkcja naprawiająca formaty daty i czasu przychodzące z Arkusza
     function cleanData(val, type) {
         if (!val) return "";
         let s = String(val);
-        
         if (type === 'date') {
-            // Jeśli Google wysłało pełną datę ISO/GMT
             if (s.includes('GMT') || s.length > 15) {
-                try {
-                    let d = new Date(val);
-                    return d.toISOString().split('T')[0];
-                } catch(e) { return s.split('T')[0]; }
+                try { return new Date(val).toISOString().split('T')[0]; } catch(e) { return s.split('T')[0]; }
             }
-            return s.includes('T') ? s.split('T')[0] : s;
+            return s.split('T')[0];
         }
-        
         if (type === 'time') {
-            // Wycinamy tylko HH:mm (np. z "18:00:00" lub "18:00")
-            let match = s.match(/(\d{2}:\d{2})/);
-            return match ? match[1] : s.substring(0, 5);
+            let m = s.match(/(\d{2}:\d{2})/);
+            return m ? m[1] : s.substring(0, 5);
         }
         return s;
     }
@@ -157,57 +148,35 @@
         try {
             const r = await fetch(SCRIPT_URL + "?t=" + Date.now());
             const data = await r.json();
-            // Mapowanie danych z czyszczeniem formatów
-            db = data.map(x => ({ 
-                id: x[0], 
-                d: cleanData(x[1], 'date'), 
-                t: cleanData(x[2], 'time'), 
-                desc: x[3] 
-            }));
+            db = data.map(x => ({ id: x[0], d: cleanData(x[1], 'date'), t: cleanData(x[2], 'time'), desc: x[3] }));
             render();
-        } catch(e) { console.error("Błąd pobierania", e); }
+        } catch(e) { console.error("Błąd ładowania"); }
         document.getElementById('loader').style.display = 'none';
     }
 
     async function save() {
         const descInput = document.getElementById('fDesc');
         if(!descInput.value) return alert("Wpisz opis!");
-
         const btn = document.getElementById('saveBtn');
-        const oldText = btn.innerText;
         btn.innerText = "ZAPISYWANIE...";
         btn.disabled = true;
 
-        const newEv = { 
-            id: Date.now(), 
-            d: document.getElementById('fDate').value, 
-            t: document.getElementById('fTime').value, 
-            desc: descInput.value 
-        };
-        
-        // Lokalna aktualizacja dla szybkości
+        const newEv = { id: Date.now(), d: document.getElementById('fDate').value, t: document.getElementById('fTime').value, desc: descInput.value };
         db.push(newEv);
         render();
 
         try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: 'save', events: db })
-            });
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', events: db }) });
             btn.innerText = "ZAPISANO!";
             descInput.value = "";
-            setTimeout(() => { btn.innerText = oldText; btn.disabled = false; }, 2000);
-        } catch(e) { alert("Błąd zapisu!"); btn.disabled = false; btn.innerText = oldText; }
+            setTimeout(() => { btn.innerText = "Zapisz w Arkuszu"; btn.disabled = false; }, 2000);
+        } catch(e) { alert("Błąd!"); btn.disabled = false; }
     }
 
     function render() {
         const cal = document.getElementById('calendar');
         const my = document.getElementById('monthYear');
-        
-        // Czyścimy dni kalendarza
-        const oldDays = cal.querySelectorAll('.day, .empty');
-        oldDays.forEach(d => d.remove());
+        cal.querySelectorAll('.day, .empty').forEach(d => d.remove());
 
         const y = curViewDate.getFullYear(), m = curViewDate.getMonth();
         my.innerText = curViewDate.toLocaleString('pl', { month: 'long', year: 'numeric' });
@@ -215,28 +184,19 @@
         const first = (new Date(y, m, 1).getDay() || 7) - 1;
         const last = new Date(y, m+1, 0).getDate();
 
-        // Puste pola na początku miesiąca
-        for(let i=0; i<first; i++) {
-            let div = document.createElement('div');
-            div.className = 'empty';
-            cal.appendChild(div);
-        }
-
-        // Dni miesiąca
+        for(let i=0; i<first; i++) { let d = document.createElement('div'); d.className='empty'; cal.appendChild(d); }
         for(let i=1; i<=last; i++) {
             const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
             const has = db.some(x => x.d === dStr);
             const sel = dStr === curSelDate ? 'selected' : '';
-            
-            let div = document.createElement('div');
-            div.className = `day ${sel}`;
-            div.innerHTML = `${i}${has?'<div class="dot"></div>':''}`;
-            div.onclick = () => selectDay(dStr);
-            cal.appendChild(div);
+            let d = document.createElement('div');
+            d.className = `day ${sel}`;
+            d.innerHTML = `${i}${has?'<div class="dot"></div>':''}`;
+            d.onclick = () => { curSelDate = dStr; document.getElementById('fDate').value = dStr; render(); };
+            cal.appendChild(d);
         }
 
-        // Plan dnia
-        document.getElementById('selectedDayLabel').innerText = curSelDate;
+        document.getElementById('selLabel').innerText = curSelDate;
         document.getElementById('dayList').innerHTML = db.filter(x => x.d === curSelDate).sort((a,b)=>a.t.localeCompare(b.t)).map(x => `
             <div class="event-item">
                 <div class="event-info"><span class="event-time">${x.t}</span><span class="event-text">${x.desc}</span></div>
@@ -244,44 +204,20 @@
             </div>
         `).join('') || '<div style="color:var(--text-dim); font-size:0.8rem">Brak planów</div>';
 
-        // Przegląd miesiąca
         const monthPrefix = `${y}-${String(m+1).padStart(2,'0')}`;
         document.getElementById('monthList').innerHTML = db.filter(x => x.d.startsWith(monthPrefix)).sort((a,b)=>a.d.localeCompare(b.d) || a.t.localeCompare(b.t)).map(x => `
             <div class="event-item" onclick="selectDay('${x.d}')" style="cursor:pointer">
-                <div class="event-info">
-                    <span style="color:var(--text-dim); font-size:0.7rem; width:20px">${x.d.split('-')[2]}</span>
-                    <span class="event-text" style="font-size:0.8rem">${x.desc}</span>
-                </div>
+                <div class="event-info"><span style="color:var(--text-dim); font-size:0.7rem; width:20px">${x.d.split('-')[2]}</span><span class="event-text" style="font-size:0.8rem">${x.desc}</span></div>
                 <span style="font-size:0.7rem; color:var(--accent-blue)">${x.t}</span>
             </div>
-        `).join('') || '<div style="color:var(--text-dim); font-size:0.8rem">Pusto w tym miesiącu</div>';
+        `).join('') || '<div style="color:var(--text-dim); font-size:0.8rem">Pusto...</div>';
     }
 
     function selectDay(d) { curSelDate = d; document.getElementById('fDate').value = d; render(); }
     function changeMonth(v) { curViewDate.setMonth(curViewDate.getMonth() + v); render(); }
-    
-    function del(id) { 
-        if(confirm("Usunąć wydarzenie?")) { 
-            db = db.filter(x => x.id !== id); 
-            saveSilently(); 
-        } 
-    }
+    function del(id) { if(confirm("Usunąć?")) { db = db.filter(x => x.id !== id); render(); fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', events: db }) }); } }
 
-    async function saveSilently() {
-        render();
-        try {
-            await fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({ action: 'save', events: db }) 
-            });
-        } catch(e) { console.error("Błąd cichego zapisu"); }
-    }
-
-    window.onload = () => {
-        document.getElementById('fDate').value = curSelDate;
-        load();
-    };
+    window.onload = () => { document.getElementById('fDate').value = curSelDate; load(); };
 </script>
 </body>
 </html>
