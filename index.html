@@ -3,25 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dart Planner Pro</title>
+    <title>Dart Planner Pro v2</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-body: #0a0b12; --bg-card: #151825; --accent-blue: #3b82f6;
             --text-main: #f8fafc; --text-dim: #8e96b3; --neumorphic: 0 10px 30px rgba(0,0,0,0.5);
+            --border: rgba(255,255,255,0.05);
         }
         body { background: var(--bg-body); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; margin: 0; }
-        .app-container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .app-container { grid-template-columns: 1fr; } }
-        .glass-card { background: var(--bg-card); border-radius: 20px; padding: 20px; box-shadow: var(--neumorphic); border: 1px solid rgba(255,255,255,0.05); }
+        
+        /* Układ 4 pól */
+        .app-container { 
+            max-width: 1200px; margin: 0 auto; 
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+        }
+        @media (max-width: 900px) { .app-container { grid-template-columns: 1fr; } }
+
+        .glass-card { 
+            background: var(--bg-card); border-radius: 20px; padding: 22px; 
+            box-shadow: var(--neumorphic); border: 1px solid var(--border); 
+            display: flex; flex-direction: column; min-height: 350px;
+        }
+
+        h3 { margin-top: 0; font-size: 1.1rem; color: var(--accent-blue); display: flex; align-items: center; gap: 10px; }
+        
+        /* Kalendarz */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: rgba(255,255,255,0.02); position: relative; }
-        .day.selected { background: var(--accent-blue); font-weight: bold; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; font-size: 0.85rem; background: rgba(255,255,255,0.02); position: relative; transition: 0.2s; }
+        .day:hover { background: rgba(255,255,255,0.08); }
+        .day.selected { background: var(--accent-blue); font-weight: 800; box-shadow: 0 0 15px rgba(59,130,246,0.4); }
         .dot { width: 4px; height: 4px; background: #ef4444; border-radius: 50%; position: absolute; bottom: 4px; }
-        input { width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: none; background: #000; color: #fff; font-family: inherit; }
-        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--accent-blue); color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .event-item { background: rgba(255,255,255,0.05); padding: 10px; margin-top: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
-        #loader { position: fixed; top: 10px; right: 10px; color: var(--accent-blue); display: none; font-weight: bold; font-size: 0.8rem; }
+
+        /* Formularz */
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid var(--border); background: #000; color: #fff; font-family: inherit; }
+        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--accent-blue); color: #fff; font-weight: 800; cursor: pointer; margin-top: auto; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); }
+
+        /* Listy wydarzeń */
+        .list-container { overflow-y: auto; flex-grow: 1; margin-top: 10px; max-height: 280px; }
+        .event-item { background: rgba(255,255,255,0.04); padding: 12px; margin-bottom: 8px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid transparent; }
+        .event-item.today { border-left-color: var(--accent-blue); }
+        
+        .month-divider { 
+            padding: 15px 0 8px 0; font-size: 0.75rem; font-weight: 800; 
+            color: var(--accent-blue); text-transform: uppercase; border-bottom: 1px solid var(--border); margin-bottom: 10px;
+        }
+
+        #loader { position: fixed; top: 10px; right: 10px; color: var(--accent-blue); display: none; font-weight: 900; font-size: 0.7rem; z-index: 1000; }
+        .scroll-custom::-webkit-scrollbar { width: 4px; }
+        .scroll-custom::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -31,26 +63,38 @@
 <div class="app-container">
     <div class="glass-card">
         <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 15px;">
-            <button onclick="changeMonth(-1)" style="background:none; border:none; color:#fff; cursor:pointer; padding:10px;">❮</button>
-            <div id="monthYear" style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem;"></div>
-            <button onclick="changeMonth(1)" style="background:none; border:none; color:#fff; cursor:pointer; padding:10px;">❯</button>
+            <button onclick="changeMonth(-1)" style="background:none; border:none; color:#fff; cursor:pointer;">❮</button>
+            <div id="monthYear" style="font-weight: 800; text-transform: uppercase;"></div>
+            <button onclick="changeMonth(1)" style="background:none; border:none; color:#fff; cursor:pointer;">❯</button>
         </div>
         <div class="cal-grid" id="calendar"></div>
     </div>
 
     <div class="glass-card">
-        <h3 style="margin-top:0; font-size: 1.1rem; color: var(--accent-blue);">🎯 Nowy Wpis</h3>
-        <input type="date" id="fDate">
-        <input type="time" id="fTime" value="18:00">
-        <input type="text" id="fDesc" placeholder="Co planujesz? (np. Trening)">
+        <h3><span>🎯</span> Nowe Wydarzenie</h3>
+        <div style="flex-grow: 1;">
+            <label style="font-size:0.7rem; color:var(--text-dim)">Data:</label>
+            <input type="date" id="fDate">
+            <label style="font-size:0.7rem; color:var(--text-dim)">Godzina:</label>
+            <input type="time" id="fTime" value="18:00">
+            <label style="font-size:0.7rem; color:var(--text-dim)">Co gramy?</label>
+            <input type="text" id="fDesc" placeholder="np. Trening, Liga, Turniej">
+        </div>
         <button id="saveBtn" class="btn" onclick="save()">ZAPISZ W ARKUSZU</button>
-        <hr style="opacity: 0.1; margin: 20px 0;">
-        <div id="dayList"></div>
+    </div>
+
+    <div class="glass-card">
+        <h3><span>📅</span> Plan Dnia: <span id="selLabel" style="margin-left:auto; color:var(--text-dim)"></span></h3>
+        <div id="dayList" class="list-container scroll-custom"></div>
+    </div>
+
+    <div class="glass-card">
+        <h3><span>🚀</span> Nadchodzące (Zbiorczo)</h3>
+        <div id="upcomingList" class="list-container scroll-custom"></div>
     </div>
 </div>
 
 <script>
-    // TWÓJ AKTUALNY LINK:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyn3_xD7N-mofYXVwNe0dLbFR088n3RKER82l0L0YhMQfdaXXjfaxB9wM3YePXeQgA4/exec";
 
     let db = [];
@@ -70,41 +114,30 @@
                 desc: x[3] 
             }));
             render();
-        } catch(e) { console.log("Błąd ładowania danych"); }
+        } catch(e) { console.log("Błąd połączenia"); }
         document.getElementById('loader').style.display = 'none';
     }
 
     async function save() {
         const desc = document.getElementById('fDesc').value;
         if(!desc) return alert("Podaj opis!");
-        
         const btn = document.getElementById('saveBtn');
-        btn.disabled = true;
-        btn.innerText = "ZAPISYWANIE...";
+        btn.disabled = true; btn.innerText = "ZAPISYWANIE...";
 
-        const newEv = { 
-            id: Date.now(), 
-            d: document.getElementById('fDate').value, 
-            t: document.getElementById('fTime').value, 
-            desc: desc 
-        };
-        
+        const newEv = { id: Date.now(), d: document.getElementById('fDate').value, t: document.getElementById('fTime').value, desc: desc };
         db.push(newEv);
         render();
 
         try {
-            await fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({ action: 'save', events: db }) 
-            });
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', events: db }) });
             document.getElementById('fDesc').value = "";
             btn.innerText = "ZAPISANO!";
             setTimeout(() => { btn.disabled = false; btn.innerText = "ZAPISZ W ARKUSZU"; }, 2000);
-        } catch(e) { alert("Błąd zapisu!"); btn.disabled = false; btn.innerText = "ZAPISZ W ARKUSZU"; }
+        } catch(e) { alert("Błąd zapisu!"); btn.disabled = false; }
     }
 
     function render() {
+        // 1. Render Kalendarza
         const cal = document.getElementById('calendar');
         cal.innerHTML = "";
         const y = curViewDate.getFullYear(), m = curViewDate.getMonth();
@@ -116,16 +149,55 @@
         for(let i=0; i<first; i++) cal.innerHTML += `<div></div>`;
         for(let i=1; i<=last; i++) {
             const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-            const has = db.some(x => x.d.includes(dStr));
+            const has = db.some(x => x.d === dStr);
             cal.innerHTML += `<div class="day ${dStr===curSelDate?'selected':''}" onclick="selectDay('${dStr}')">${i}${has?'<div class="dot"></div>':''}</div>`;
         }
 
-        document.getElementById('dayList').innerHTML = db.filter(x => x.d.includes(curSelDate)).sort((a,b)=>a.t.localeCompare(b.t)).map(x => `
+        // 2. Render Planu Dnia
+        document.getElementById('selLabel').innerText = curSelDate;
+        document.getElementById('dayList').innerHTML = db.filter(x => x.d === curSelDate).sort((a,b)=>a.t.localeCompare(b.t)).map(x => `
             <div class="event-item">
-                <span style="font-size: 0.9rem;"><b style="color:var(--accent-blue)">${x.t}</b> ${x.desc}</span>
+                <span><b>${x.t}</b> ${x.desc}</span>
                 <button onclick="del(${x.id})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold;">✕</button>
             </div>
-        `).join('') || "<div style='color:var(--text-dim); font-size:0.8rem;'>Brak wydarzeń na ten dzień.</div>";
+        `).join('') || "<div style='color:var(--text-dim); padding:20px; text-align:center; font-size:0.8rem;'>Brak planów na ten dzień.</div>";
+
+        // 3. Render Nadchodzących (Zbiorczo)
+        renderUpcoming();
+    }
+
+    function renderUpcoming() {
+        const upcomingContainer = document.getElementById('upcomingList');
+        const now = new Date().toISOString().split('T')[0];
+        
+        // Sortowanie po dacie i godzinie
+        const futureEvents = db
+            .filter(x => x.d >= now)
+            .sort((a, b) => a.d.localeCompare(b.d) || a.t.localeCompare(b.t));
+
+        let html = "";
+        let lastMonth = "";
+
+        futureEvents.forEach(x => {
+            const dateObj = new Date(x.d);
+            const monthLabel = dateObj.toLocaleString('pl', { month: 'long', year: 'numeric' });
+
+            if (monthLabel !== lastMonth) {
+                html += `<div class="month-divider">${monthLabel}</div>`;
+                lastMonth = monthLabel;
+            }
+
+            html += `
+                <div class="event-item ${x.d === now ? 'today' : ''}">
+                    <div style="display:flex; flex-direction:column">
+                        <span style="font-size:0.6rem; color:var(--accent-blue); font-weight:800">${x.d}</span>
+                        <span style="font-size:0.9rem"><b>${x.t}</b> ${x.desc}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        upcomingContainer.innerHTML = html || "<div style='color:var(--text-dim); padding:20px; text-align:center; font-size:0.8rem;'>Brak nadchodzących wydarzeń.</div>";
     }
 
     function selectDay(d) { curSelDate = d; document.getElementById('fDate').value = d; render(); }
