@@ -7,75 +7,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #0a0b12;
-            --bg-card: #151825;
-            --border-card: rgba(255, 255, 255, 0.05);
-            --accent-blue: #3b82f6;
-            --text-main: #f8fafc;
-            --text-dim: #8e96b3;
-            --lig-red: #ef4444;
-            --neumorphic: 10px 10px 20px rgba(0,0,0,0.5), -5px -5px 15px rgba(255,255,255,0.02);
-            --transition: 0.3s ease;
+            --bg-body: #0a0b12; --bg-card: #151825; --accent-blue: #3b82f6;
+            --text-main: #f8fafc; --text-dim: #8e96b3; --neumorphic: 0 10px 30px rgba(0,0,0,0.5);
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body {
-            background: var(--bg-body);
-            background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
-            color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0; padding: 15px; min-height: 100vh;
-        }
-
-        .app-container { width: 100%; max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
-        @media (max-width: 850px) { .app-container { grid-template-columns: 1fr; } }
-
-        .glass-card {
-            background: var(--bg-card); backdrop-filter: blur(20px);
-            border: 1px solid var(--border-card); border-radius: 24px;
-            padding: 20px; box-shadow: var(--neumorphic); transition: var(--transition);
-        }
-
-        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
-        .month-label { font-weight: 800; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-btn { background: none; border: none; color: var(--accent-blue); cursor: pointer; font-size: 1.2rem; }
-
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-name { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; padding-bottom: 8px; }
-        .day {
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
-            transition: var(--transition); position: relative; background: rgba(255,255,255,0.02);
-        }
-        .day.selected { background: var(--accent-blue); color: white; box-shadow: 0 0 15px rgba(59,130,246,0.5); font-weight: 800; }
-        .dot { width: 4px; height: 4px; background: var(--lig-red); border-radius: 50%; position: absolute; bottom: 4px; }
-
-        .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .modern-input {
-            flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-card);
-            border-radius: 12px; padding: 12px; color: white; font-family: inherit; font-size: 0.9rem;
-        }
-        .btn-save {
-            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-            color: white; border: none; padding: 14px; border-radius: 12px;
-            width: 100%; font-weight: 800; text-transform: uppercase; cursor: pointer;
-            margin-top: 10px; box-shadow: 0 8px 15px rgba(59,130,246,0.3);
-        }
-
-        .section-title { font-weight: 800; font-size: 0.9rem; margin-bottom: 15px; color: var(--text-dim); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
-        .event-item {
-            background: rgba(255,255,255,0.03); padding: 12px 15px; border-radius: 15px;
-            margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
-            border: 1px solid var(--border-card);
-        }
-        .event-info { display: flex; align-items: center; gap: 12px; overflow: hidden; }
-        .event-time { font-weight: 800; color: var(--accent-blue); font-size: 0.95rem; min-width: 45px; }
-        .event-text { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-weight: 800; opacity: 0.3; transition: 0.2s; padding: 5px; }
-        .del-btn:hover { opacity: 1; }
-
-        #loader { position: fixed; top: 10px; right: 10px; font-size: 0.6rem; color: var(--accent-blue); font-weight: 800; display: none; z-index: 100; }
+        body { background: var(--bg-body); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; margin: 0; }
+        .app-container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .app-container { grid-template-columns: 1fr; } }
+        .glass-card { background: var(--bg-card); border-radius: 20px; padding: 20px; box-shadow: var(--neumorphic); border: 1px solid rgba(255,255,255,0.05); }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: rgba(255,255,255,0.02); position: relative; }
+        .day.selected { background: var(--accent-blue); font-weight: bold; }
+        .dot { width: 4px; height: 4px; background: #ef4444; border-radius: 50%; position: absolute; bottom: 4px; }
+        input { width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: none; background: #000; color: #fff; font-family: inherit; }
+        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--accent-blue); color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .event-item { background: rgba(255,255,255,0.05); padding: 10px; margin-top: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        #loader { position: fixed; top: 10px; right: 10px; color: var(--accent-blue); display: none; font-weight: bold; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -83,139 +29,115 @@
 <div id="loader">SYNCHRONIZACJA...</div>
 
 <div class="app-container">
-    <div>
-        <div class="glass-card">
-            <div class="header-row">
-                <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
-                <div id="monthYear" class="month-label"></div>
-                <button class="nav-btn" onclick="changeMonth(1)">❯</button>
-            </div>
-            <div class="cal-grid" id="calendar">
-                <div class="day-name">Pn</div><div class="day-name">Wt</div><div class="day-name">Śr</div><div class="day-name">Cz</div><div class="day-name">Pt</div><div class="day-name">Sb</div><div class="day-name">Nd</div>
-            </div>
+    <div class="glass-card">
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 15px;">
+            <button onclick="changeMonth(-1)" style="background:none; border:none; color:#fff; cursor:pointer; padding:10px;">❮</button>
+            <div id="monthYear" style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem;"></div>
+            <button onclick="changeMonth(1)" style="background:none; border:none; color:#fff; cursor:pointer; padding:10px;">❯</button>
         </div>
-        <br>
-        <div class="glass-card">
-            <div class="section-title"><span>📊</span> Przegląd miesiąca</div>
-            <div id="monthList"></div>
-        </div>
+        <div class="cal-grid" id="calendar"></div>
     </div>
 
-    <div>
-        <div class="glass-card">
-            <div class="section-title" style="color: var(--accent-blue);"><span>🎯</span> Nowe wydarzenie</div>
-            <div class="input-row">
-                <input type="date" id="fDate" class="modern-input">
-                <input type="time" id="fTime" class="modern-input" value="18:00">
-            </div>
-            <input type="text" id="fDesc" class="modern-input" placeholder="Co gramy? (np. Trening, Liga)">
-            <button class="btn-save" id="saveBtn" onclick="save()">Zapisz w Arkuszu</button>
-        </div>
-        <br>
-        <div class="glass-card">
-            <div class="section-title"><span>📅</span> Plan dnia <span id="selLabel" style="margin-left:auto; font-size:0.7rem; color:var(--accent-blue)"></span></div>
-            <div id="dayList"></div>
-        </div>
+    <div class="glass-card">
+        <h3 style="margin-top:0; font-size: 1.1rem; color: var(--accent-blue);">🎯 Nowy Wpis</h3>
+        <input type="date" id="fDate">
+        <input type="time" id="fTime" value="18:00">
+        <input type="text" id="fDesc" placeholder="Co planujesz? (np. Trening)">
+        <button id="saveBtn" class="btn" onclick="save()">ZAPISZ W ARKUSZU</button>
+        <hr style="opacity: 0.1; margin: 20px 0;">
+        <div id="dayList"></div>
     </div>
 </div>
 
 <script>
-    // --- TUTAJ WKLEJ LINK, KTÓRY TERAZ WYŚWIETLA CI KOD ---
-    const SCRIPT_URL = "TWÓJ_URL_DO_SCRIPTU_GOOGLE"; 
-    
+    // TWÓJ AKTUALNY LINK:
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyn3_xD7N-mofYXVwNe0dLbFR088n3RKER82l0L0YhMQfdaXXjfaxB9wM3YePXeQgA4/exec";
+
     let db = [];
     let curViewDate = new Date();
     let curSelDate = new Date().toISOString().split('T')[0];
-
-    function cleanData(val, type) {
-        if (!val) return "";
-        let s = String(val);
-        if (type === 'date') {
-            if (s.includes('GMT') || s.length > 15) {
-                try { return new Date(val).toISOString().split('T')[0]; } catch(e) { return s.split('T')[0]; }
-            }
-            return s.split('T')[0];
-        }
-        if (type === 'time') {
-            let m = s.match(/(\d{2}:\d{2})/);
-            return m ? m[1] : s.substring(0, 5);
-        }
-        return s;
-    }
 
     async function load() {
         document.getElementById('loader').style.display = 'block';
         try {
             const r = await fetch(SCRIPT_URL + "?t=" + Date.now());
-            const data = await r.json();
-            db = data.map(x => ({ id: x[0], d: cleanData(x[1], 'date'), t: cleanData(x[2], 'time'), desc: x[3] }));
+            const text = await r.text();
+            const data = JSON.parse(text);
+            db = data.map(x => ({ 
+                id: x[0], 
+                d: String(x[1]).split('T')[0], 
+                t: String(x[2]).replace(/'/g, "").substring(0,5), 
+                desc: x[3] 
+            }));
             render();
-        } catch(e) { console.error("Błąd ładowania"); }
+        } catch(e) { console.log("Błąd ładowania danych"); }
         document.getElementById('loader').style.display = 'none';
     }
 
     async function save() {
-        const descInput = document.getElementById('fDesc');
-        if(!descInput.value) return alert("Wpisz opis!");
+        const desc = document.getElementById('fDesc').value;
+        if(!desc) return alert("Podaj opis!");
+        
         const btn = document.getElementById('saveBtn');
-        btn.innerText = "ZAPISYWANIE...";
         btn.disabled = true;
+        btn.innerText = "ZAPISYWANIE...";
 
-        const newEv = { id: Date.now(), d: document.getElementById('fDate').value, t: document.getElementById('fTime').value, desc: descInput.value };
+        const newEv = { 
+            id: Date.now(), 
+            d: document.getElementById('fDate').value, 
+            t: document.getElementById('fTime').value, 
+            desc: desc 
+        };
+        
         db.push(newEv);
         render();
 
         try {
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', events: db }) });
+            await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ action: 'save', events: db }) 
+            });
+            document.getElementById('fDesc').value = "";
             btn.innerText = "ZAPISANO!";
-            descInput.value = "";
-            setTimeout(() => { btn.innerText = "Zapisz w Arkuszu"; btn.disabled = false; }, 2000);
-        } catch(e) { alert("Błąd!"); btn.disabled = false; }
+            setTimeout(() => { btn.disabled = false; btn.innerText = "ZAPISZ W ARKUSZU"; }, 2000);
+        } catch(e) { alert("Błąd zapisu!"); btn.disabled = false; btn.innerText = "ZAPISZ W ARKUSZU"; }
     }
 
     function render() {
         const cal = document.getElementById('calendar');
-        const my = document.getElementById('monthYear');
-        cal.querySelectorAll('.day, .empty').forEach(d => d.remove());
-
+        cal.innerHTML = "";
         const y = curViewDate.getFullYear(), m = curViewDate.getMonth();
-        my.innerText = curViewDate.toLocaleString('pl', { month: 'long', year: 'numeric' });
+        document.getElementById('monthYear').innerText = curViewDate.toLocaleString('pl', { month: 'long', year: 'numeric' });
 
         const first = (new Date(y, m, 1).getDay() || 7) - 1;
         const last = new Date(y, m+1, 0).getDate();
 
-        for(let i=0; i<first; i++) { let d = document.createElement('div'); d.className='empty'; cal.appendChild(d); }
+        for(let i=0; i<first; i++) cal.innerHTML += `<div></div>`;
         for(let i=1; i<=last; i++) {
             const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-            const has = db.some(x => x.d === dStr);
-            const sel = dStr === curSelDate ? 'selected' : '';
-            let d = document.createElement('div');
-            d.className = `day ${sel}`;
-            d.innerHTML = `${i}${has?'<div class="dot"></div>':''}`;
-            d.onclick = () => { curSelDate = dStr; document.getElementById('fDate').value = dStr; render(); };
-            cal.appendChild(d);
+            const has = db.some(x => x.d.includes(dStr));
+            cal.innerHTML += `<div class="day ${dStr===curSelDate?'selected':''}" onclick="selectDay('${dStr}')">${i}${has?'<div class="dot"></div>':''}</div>`;
         }
 
-        document.getElementById('selLabel').innerText = curSelDate;
-        document.getElementById('dayList').innerHTML = db.filter(x => x.d === curSelDate).sort((a,b)=>a.t.localeCompare(b.t)).map(x => `
+        document.getElementById('dayList').innerHTML = db.filter(x => x.d.includes(curSelDate)).sort((a,b)=>a.t.localeCompare(b.t)).map(x => `
             <div class="event-item">
-                <div class="event-info"><span class="event-time">${x.t}</span><span class="event-text">${x.desc}</span></div>
-                <button class="del-btn" onclick="del(${x.id})">✕</button>
+                <span style="font-size: 0.9rem;"><b style="color:var(--accent-blue)">${x.t}</b> ${x.desc}</span>
+                <button onclick="del(${x.id})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold;">✕</button>
             </div>
-        `).join('') || '<div style="color:var(--text-dim); font-size:0.8rem">Brak planów</div>';
-
-        const monthPrefix = `${y}-${String(m+1).padStart(2,'0')}`;
-        document.getElementById('monthList').innerHTML = db.filter(x => x.d.startsWith(monthPrefix)).sort((a,b)=>a.d.localeCompare(b.d) || a.t.localeCompare(b.t)).map(x => `
-            <div class="event-item" onclick="selectDay('${x.d}')" style="cursor:pointer">
-                <div class="event-info"><span style="color:var(--text-dim); font-size:0.7rem; width:20px">${x.d.split('-')[2]}</span><span class="event-text" style="font-size:0.8rem">${x.desc}</span></div>
-                <span style="font-size:0.7rem; color:var(--accent-blue)">${x.t}</span>
-            </div>
-        `).join('') || '<div style="color:var(--text-dim); font-size:0.8rem">Pusto...</div>';
+        `).join('') || "<div style='color:var(--text-dim); font-size:0.8rem;'>Brak wydarzeń na ten dzień.</div>";
     }
 
     function selectDay(d) { curSelDate = d; document.getElementById('fDate').value = d; render(); }
     function changeMonth(v) { curViewDate.setMonth(curViewDate.getMonth() + v); render(); }
-    function del(id) { if(confirm("Usunąć?")) { db = db.filter(x => x.id !== id); render(); fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', events: db }) }); } }
+    
+    function del(id) { 
+        if(confirm("Usunąć wpis?")) { 
+            db = db.filter(x => x.id !== id); 
+            render(); 
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', events: db }) }); 
+        } 
+    }
 
     window.onload = () => { document.getElementById('fDate').value = curSelDate; load(); };
 </script>
